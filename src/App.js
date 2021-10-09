@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { GoogleAuthProvider, getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import './App.css';
 import initializeAuthentication from './Firebase/firebase.init';
@@ -8,6 +8,7 @@ initializeAuthentication();
 const googleProvider = new GoogleAuthProvider();
 
 function App() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassord] = useState('');
   const [error, setError] = useState('');
@@ -25,6 +26,9 @@ function App() {
   }
   const handleEmailChange = e => {
     setEmail(e.target.value);
+  }
+  const handleNameChange = e => {
+    setName(e.target.value);
   }
   const handlePasswordChange = e => {
     setPassord(e.target.value);
@@ -57,14 +61,14 @@ function App() {
   }
 
   const processLogin = (email, password) => {
-      signInWithEmailAndPassword(auth, email, password)
-      .then(result =>{
+    signInWithEmailAndPassword(auth, email, password)
+      .then(result => {
         const user = result.user;
         console.log(user);
         setError('');
-        
+
       })
-      .catch(error =>{
+      .catch(error => {
         setError(error.message);
       })
   }
@@ -76,34 +80,49 @@ function App() {
         console.log(user);
         setError('');
         verifyEmail();
+        setUserName();
       })
       .catch(error => {
         setError(error.message);
       })
 
+      const setUserName = () =>{
+        updateProfile(auth.currentUser,{displayName:name})
+        .then(result=>{
+          
+        })
+      }
   }
-const verifyEmail = () =>{
-  sendEmailVerification(auth.currentUser)
-  .then( result =>{
-    console.log(result);
-  })
-}
+  const verifyEmail = () => {
+    sendEmailVerification(auth.currentUser)
+      .then(result => {
+        console.log(result);
+      })
+  }
 
-const handleResetPassword = () =>{
-  sendPasswordResetEmail(auth, email)
-  .then(result =>{
+  const handleResetPassword = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(result => {
 
-  })
-}
+      })
+  }
 
   return (
     <div className="p-5">
       <form onSubmit={handleRegister}>
         <h3 className="text-info">Please {isLogIn ? 'login' : 'Register'}</h3>
-        <div className="row mb-3">
-          <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">Email</label>
+       
+        {!isLogIn && <div className="row mb-3">
+          <label htmlFor="inputName" className="col-sm-2 col-form-label">Name</label>
           <div className="col-sm-10">
-            <input onChange={handleEmailChange} type="email" className="form-control" id="inputEmail3" required />
+            <input onBlur={handleNameChange} type="text" className="form-control" placeholder="Your name" required />
+          </div>
+        </div>}
+
+        <div className="row mb-3">
+          <label htmlFor="inputEmail3"  className="col-sm-2 col-form-label">Email</label>
+          <div className="col-sm-10">
+            <input onChange={handleEmailChange} type="email" placeholder="Your email" className="form-control" id="inputEmail3" required />
           </div>
         </div>
         <div className="row mb-3">
@@ -120,7 +139,7 @@ const handleResetPassword = () =>{
             <div class="form-check">
 
               <input onChange={toggleLogin} class="form-check-input" type="checkbox" id="gridCheck1" />
-              <label class="form-check-label" for="gridCheck1">
+              <label className="form-check-label" for="gridCheck1">
                 Already Registered?
               </label>
             </div>
