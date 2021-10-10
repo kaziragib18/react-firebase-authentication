@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, updateProfile } from "firebase/auth";
+import { GoogleAuthProvider, FacebookAuthProvider,  getAuth, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import './App.css';
 import initializeAuthentication from './Firebase/firebase.init';
@@ -6,6 +6,7 @@ import initializeAuthentication from './Firebase/firebase.init';
 initializeAuthentication();
 
 const googleProvider = new GoogleAuthProvider();
+const facebookProvider = new FacebookAuthProvider();
 
 function App() {
   const [name, setName] = useState('');
@@ -21,6 +22,14 @@ function App() {
       .then(result => {
         const user = result.user;
         console.log(user);
+      })
+
+  }
+  const handleFacebookSignIn = () => {
+    signInWithPopup(auth, facebookProvider)
+      .then(result => {
+       const user = result.user;
+       console.log(user);
       })
 
   }
@@ -88,9 +97,7 @@ function App() {
 
       const setUserName = () =>{
         updateProfile(auth.currentUser,{displayName:name})
-        .then(result=>{
-          
-        })
+        .then(result=>{ })
       }
   }
   const verifyEmail = () => {
@@ -153,6 +160,7 @@ function App() {
       <br />
       <br />
       <button onClick={handleGoogleSignIn}>Google Sign In</button>
+      <button onClick={handleFacebookSignIn}>Facebook Sign In</button>
     </div>
   );
 }
